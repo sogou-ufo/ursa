@@ -7,7 +7,7 @@ import sys
 
 import server
 import log
-
+import cli
 
 
 
@@ -33,16 +33,24 @@ def run():
     if commandName == 'help':
         commandName = 'uhelp'
 
+    args = args[2:]
+
 
     try:
-        command = __import__( 'commands.' + commandName , globals() , locals() , ['run'] )
-        command.run( args[2:] )
+        command = __import__( 'commands.' + commandName , globals() , locals() , ['run' , 'options'] )
     except:
         log.error('Invalid commandName: ' + commandName )
         return
-        
-        
 
+
+    argInfo = cli.parseArgv(args , command.options)
+
+    if len(argInfo['errors']) > 0:
+        for error in argInfo['errors']:
+            log.log(error)
+        log.error('Invalid command line. Try `ursa help <command>`');
+        return;
+    command.run(argInfo['params'],argInfo['options'] );
         
 
 
