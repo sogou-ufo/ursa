@@ -1,15 +1,18 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
-options = [{
-    'shortName':'c',
-    'longName':'compile',
-    'hasValue' :False
-} ]
+import server
+
+
+options = [ ]
+
+
 
 
 def run(params , options):
     """
     """
-    print params 
-    print options
+    if len(params) and params[0].isdigit():
+        server.run(int(params[0]))
+    else:
+        server.run()
