@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
-import server
+try:
+    import ursa.server as server
+except:
+    import server
 
 
 options = [ ]

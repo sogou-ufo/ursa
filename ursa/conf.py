@@ -5,9 +5,10 @@ import os
 
 path = os.getcwd()
 encoding = 'utf-8'
+base = os.path.abspath(os.path.dirname(__file__)) 
 
 
-
+template_dir = 'template'
 
 
 

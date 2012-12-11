@@ -16,7 +16,8 @@ import urllib
 import conf
 import log
 import parser
-
+import utils
+import mgr
 
 class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     """
@@ -77,24 +78,49 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         if not isInServerConfig:
             print truncate_path
             if truncate_path.endswith('.do'):#为模版文件
-                tplToken = truncate_path.replace('.do'  , '') 
-                tplToken = tplToken[1:]
+                tplToken = truncate_path.replace('.do'  , '') [1:]
+
                 body = parser.parse(tplToken)
-                
+
+
                 if len(body):
                     response,contentType = (200 , 'text/html')
                 else:
-                    response,contentType,body = (404 , 'text/html' , 'no template called ' + tplpath)
+                    response,contentType,body = (404 , 'text/html' , 'no template called ' + tplToken)
+            elif truncate_path.endswith('.m'):#为模版管理
+                tplToken = truncate_path.replace('.m' , '')[1:]
+                tpl = parser.parse(tplToken)
+                print tpl
+                if len(tpl):
+                    body = mgr.getPage(tplToken)
+                    response,contentType,body = (200,'text/html' , body)
+                else:
+                    response,contentType,body = (404,'text/html' , 'Error finding tpl file.')
             else:
                 response, contentType, body = self.server_static(truncate_path) 
         self.sendResponseWithOutput(response , contentType , body)
+
+    def do_POST(self):
+        length = int(self.headers.getheader('content-length'))
+        body = self.rfile.read(length)
+        body = utils.queryToDict(body)
+        tpl = body['tpl']
+        try:
+            data = json.loads(body['data'])
+            mgr.setData( tpl , data )
+            self.sendResponseWithOutput( 200 , 'text/html' , 'Add Data Success.' )
+        except ValueError:  
+            self.sendResponseWithOutput( 200 , 'text/html' , 'Json format error' )
+        except:
+            raise
+        
            
         
 
     def server_static(self,file_path):
         file_path = '.' + file_path
         if not os.path.exists(file_path):
-            return (404, 'text/html', 'no such file, may be your forget add /doc/, for example "/doc/' + file_path + '"')
+            return (404, 'text/html', 'no such file.')
     
         if os.path.isfile(file_path):
             stat_result = os.stat(file_path)    
@@ -135,7 +161,10 @@ def run(port = 8150 , handler_class = PrHandler):
     except socket.error:
         log.error('Maybe port ' + str(port) + ' already in use')
         log.error('You can try another port by use "ursa start 8234"')
-        sys.exit(1)'''
+        sys.exit(1)
+except KeyboardInterrupt:
+    print "^C received, shutting down"
+    httpd.socket.close()'''
         
 
 

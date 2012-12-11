@@ -2,6 +2,7 @@
 #-*- coding:utf-8 -*-
 
 import codecs
+import urllib
 
 import conf
 
@@ -19,3 +20,19 @@ def readFile(filename ):
                     
     return body
     
+
+
+def queryToDict(query):
+    """
+    
+    Arguments:
+    - `query`:
+    """
+    query = query.strip('&')
+    query = query.split('&')
+    data = {}
+    for item in query:
+        pairs = item.split('=')
+        data[pairs[0]] = urllib.unquote_plus(pairs[1])
+
+    return data

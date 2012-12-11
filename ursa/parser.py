@@ -4,7 +4,7 @@
 import codecs
 import os
 
-from jinja2 import Template
+from jinja2 import Template,Environment,FileSystemLoader,TemplateNotFound
 
 import conf
 import utils
@@ -12,30 +12,35 @@ import json
 
 
 
+import mgr
 
 
 
+jinjaenv = Environment( loader=FileSystemLoader( os.path.join( conf.getConfig()['path'], conf.getConfig()['template_dir']) ,  conf.getConfig()['encoding']) )
 
 
-
-
-def parse(token):
+def parse(token , data={} , noGetTpl = False):
     """
     """
-    tpl = conf.getPath() + '/template/' + token + '.tpl'
-    dataFile = conf.getPath() + '/.data/' + token + '.json'
+    if not noGetTpl:
+        tpl = token + '.tpl'
+        dataFile = conf.getPath() + '/.data/' + token + '.json'
+    else:
+        tpl = token
 
-    if os.path.exists(tpl):
-        
+
+    if not noGetTpl:
+        body = jinjaenv.get_template(tpl)
+    elif os.path.exists(tpl):
         body = Template(utils.readFile(tpl))
-        if os.path.exists(dataFile):
-            print 111
-            data = json.loads(utils.readFile(dataFile))
-        else:
-            data = {}
-
-        body = body.render(data)
-
-        return body
     else:
         return ''
+    
+    if not len(data) :
+        data = mgr.getData(token)
+    try:    
+        body = body.render(data)
+    except TemplateNotFound as e:
+        return 'Template %s not found' % (str(e) ,)
+        
+    return body

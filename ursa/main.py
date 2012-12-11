@@ -39,6 +39,7 @@ def run():
     try:
         command = __import__( 'commands.' + commandName , globals() , locals() , ['run' , 'options'] )
     except:
+        raise
         log.error('Invalid commandName: ' + commandName )
         return
 
