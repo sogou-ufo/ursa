@@ -1,22 +1,20 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
-import os
 import sys
+import conf
+
+#add current folder to path
+sys.path.append( conf.getConfig()['base'] )
+
+
+
+import os
 
 
 import server
 import log
 import cli
-
-
-
-
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))  + os.sep
-
-
-
-
 
 def run():
     args = sys.argv

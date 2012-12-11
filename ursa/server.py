@@ -18,6 +18,7 @@ import log
 import parser
 import utils
 import mgr
+import socket
 
 class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     """
@@ -151,20 +152,18 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
 
 def run(port = 8150 , handler_class = PrHandler):
-    httpd = BaseHTTPServer.HTTPServer(('', port), handler_class)
-    log.success('server in http://localhost:' + str(port) )
-    httpd.serve_forever()
-    '''try:
-        httpd = BaseHTTPServer.HTTPServer((conf.getPath(), port), handler_class)
-        print 'server in http://localhost:' + str(port) 
+    try:
+        httpd = BaseHTTPServer.HTTPServer(('', port), handler_class)
+        log.success('server in http://localhost:' + str(port) )
         httpd.serve_forever()
+    except (KeyboardInterrupt , SystemExit):
+        log.log("^C received, shutting down")
+        httpd.socket.close()
     except socket.error:
         log.error('Maybe port ' + str(port) + ' already in use')
         log.error('You can try another port by use "ursa start 8234"')
+        raise
         sys.exit(1)
-except KeyboardInterrupt:
-    print "^C received, shutting down"
-    httpd.socket.close()'''
         
 
 
