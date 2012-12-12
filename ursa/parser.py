@@ -19,7 +19,7 @@ import mgr
 jinjaenv = Environment( loader=FileSystemLoader( os.path.join( conf.getConfig()['path'], conf.getConfig()['template_dir']) ,  conf.getConfig()['encoding']) )
 
 
-def parse(token , data={} , noGetTpl = False):
+def parseTpl(token , data={} , noGetTpl = False):
     """
     """
     if not noGetTpl:
@@ -32,7 +32,7 @@ def parse(token , data={} , noGetTpl = False):
     if not noGetTpl:
         body = jinjaenv.get_template(tpl)
     elif os.path.exists(tpl):
-        body = Template(utils.readFile(tpl))
+        body = Template(utils.readfile(tpl))
     else:
         return ''
     

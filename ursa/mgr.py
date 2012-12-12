@@ -12,7 +12,7 @@ import parser
 
 BASE = conf.getPath() + os.sep + '.data' + os.sep
 SUFFIX = '.json'
-
+COMMON_TOKEN = '.ursa'
 
 def getRawData(token):
     """获取原始文件
@@ -22,7 +22,7 @@ def getRawData(token):
     """
     fpath = BASE + token + SUFFIX
     if os.path.exists(fpath):
-        return utils.readFile( fpath )
+        return utils.readfile( fpath )
     else:
         return ''
     
@@ -38,6 +38,15 @@ def getData(token):
         data = json.loads(data)
     else:
         data = {}
+    
+    commonpath = BASE + COMMON_TOKEN + SUFFIX
+    if os.path.exists(commonpath):
+        commondata = json.loads( utils.readfile( commonpath ) )
+    else:
+        commondata = {}
+    
+    data.update(commondata)
+    data.update({'_token':token})
     return data
 
 
@@ -62,9 +71,9 @@ def getPage(token):
     - `token`:
     """
     base = conf.getConfig()['base']
-    mgrTpl = base + os.sep + os.sep.join(['assets' , 'mgr' , 'index.html'])
+    mgrTpl = os.path.join([ base , 'assets' , 'mgr' , 'index.html'])
 
-    body = parser.parse(mgrTpl , {
+    body = parser.parseTpl(mgrTpl , {
             'name':token,
             'data': getRawData(token)
             } , True)

@@ -4,8 +4,7 @@
 options = []
 
 
-def run(args):
+def run(params , options):
     """
     """
-    print args
     print 'see https://github.com/sogou-ufo/ursa/wiki'

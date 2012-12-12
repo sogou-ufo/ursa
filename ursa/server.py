@@ -81,7 +81,7 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             if truncate_path.endswith('.do'):#为模版文件
                 tplToken = truncate_path.replace('.do'  , '') [1:]
 
-                body = parser.parse(tplToken)
+                body = parser.parseTpl(tplToken)
 
 
                 if len(body):
@@ -90,7 +90,7 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                     response,contentType,body = (404 , 'text/html' , 'no template called ' + tplToken)
             elif truncate_path.endswith('.m'):#为模版管理
                 tplToken = truncate_path.replace('.m' , '')[1:]
-                tpl = parser.parse(tplToken)
+                tpl = parser.parseTpl(tplToken)
                 print tpl
                 if len(tpl):
                     body = mgr.getPage(tplToken)
