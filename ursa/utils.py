@@ -8,19 +8,26 @@ import shutil
 
 import conf
 
-def readfile(filename ):
+def readfile(filename  , mode='r'):
     """
     
     Arguments:
     - `filename`:
     - `encoding`:
     """
-    
-    f = codecs.open(filename , 'r' , conf.getConfig()['encoding'])
+    if 'b' in mode:#Binary file
+        f = open( filename , mode )
+    else:
+        f = codecs.open(filename , mode , conf.getConfig()['encoding'])
     body = f.read()
     f.close()
                     
     return body
+
+def writefile(filename , content):
+    f = codecs.open(filename , 'w' , conf.getConfig()['encoding'])
+    f.write(content)
+    f.close()
     
 def copyfiles(sourceDir, targetDir):
     """拷贝文件夹
@@ -84,3 +91,20 @@ def isyes(value):
     - `value`:
     """
     return value.lower() in ['y' , 'yes' ]
+
+
+def md5toInt(md5):
+    """将md5得到的字符串变化为6位数字传回。
+    基本算法是将得到的32位字符串切分成两部分，每部分按16进制得整数后除997，求得的余数相加
+    最终得到6位
+    
+    Arguments:
+    - `md5`:
+    """
+    md5 = [ md5[:16] , md5[16:] ]
+    result = ''
+    for item in md5:
+        num = str( int( item , 16 ) % 997 ).zfill(3)
+        result = result+num
+        
+    return result

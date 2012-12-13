@@ -13,7 +13,7 @@
         
 require.config({
     baseUrl:"/static/js",
-    urlArgs:"t=" + (+new Date())
+    urlArgs:"t=@tm:/static/js/main.js@"
 });
 
 require(['main'] , function(main){

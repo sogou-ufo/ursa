@@ -25,6 +25,10 @@ setup(
     packages=['ursa' , 'ursa.commands' , 'ursa.jinja2' ],
     
     data_files = data_files,
+
+    install_requires=[
+        "beautifulsoup4"
+        ],
     
     entry_points = {
         'console_scripts':[

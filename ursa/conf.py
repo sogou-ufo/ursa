@@ -9,7 +9,7 @@ base = os.path.abspath(os.path.dirname(__file__))
 
 
 template_dir = 'template'
-
+static_prefix = ''
 
 
 
