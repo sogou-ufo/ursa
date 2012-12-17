@@ -2,6 +2,10 @@
 #-*- coding:utf-8 -*-
 
 import os
+import json
+
+import utils
+import log
 
 path = os.getcwd()
 encoding = 'utf-8'
@@ -27,7 +31,19 @@ def getPath():
 def getConfig():
     """
     """
-    return globals()
+    conf = globals().copy()
+    conffile = os.path.join(path , 'manifest.json')
+    if os.path.exists(conffile):
+        try:
+            f = open(conffile)
+            body = f.read()
+            f.close()
+            conf.update( json.loads( body ) )
+        except ValueError:
+            log.error('Your format of manifest.json is wrong.')
+        except:
+            raise
+    return conf
 
 
 

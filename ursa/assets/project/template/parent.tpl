@@ -12,7 +12,7 @@
     <script type="text/javascript">
         
 require.config({
-    baseUrl:"/static/js",
+    baseUrl:"@static_prefix@/static/js",
     urlArgs:"t=@tm:/static/js/main.js@"
 });
 

@@ -15,10 +15,13 @@ import urllib
 
 import conf
 import log
-import parser
+import uparser as parser
 import utils
 import mgr
 import socket
+
+sys.path.append( conf.getConfig()['path'] ) # add local plugins
+
 
 class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     """
@@ -36,16 +39,16 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         if response != 301:
             self.wfile.write(body)
 
-    def urlProxy(self , url):
-        response = urllib2.urlopen(url)
+    def urlProxy(self , url , query):
+        response = urllib2.urlopen(url + '?' + query)
         contentType = response.info()['Content-Type']
         body = response.read()
         return (contentType,body)
 
     def pluginsProxy(self , plugins , params):
         try:
-            exec("from " + plugins+" import main")
-            return main(params)
+            pkg = __import__( plugins , globals() , locals() , ['main'] , -1 )
+            return pkg.main(params)
         except:
             return ('text/html;charset=utf-8' , "Unexpected error:"+ str(sys.exc_info()))
         
@@ -59,25 +62,23 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         """
         truncate_path = self.path.split('?')[0].split('#')[0]
         path_items = self.path.split('?')
+        query = path_items[1] if len(path_items) > 1 else ''
         response = 200
-
+        print query
 
         serverConfig = conf.getConfig()
 
         isInServerConfig = False
-        for reg,target in serverConfig.items():
-            if re.search(reg , truncate_path):
-                isInServerConfig = True
-                if target.startswith('http'):#http url
-                    contentType,body =self.urlProxy(target)
-                elif target.startswith('plugins'):#local plugins
-                    path = ''
-                    if( len(path_items) >1 ):
-                        path = path_items[1]
-                    contentType , body = self.pluginsProxy(target , path)
+        if 'proxy' in serverConfig:
+            for reg,target in serverConfig['proxy'].items():
+                if re.search(reg , truncate_path):
+                    isInServerConfig = True
+                    if target.startswith('http'):#http url
+                        contentType,body =self.urlProxy(target , query)
+                    elif target.startswith('plugins'):#local plugins
+                        contentType , body = self.pluginsProxy(target , query)
 
         if not isInServerConfig:
-            print truncate_path
             if truncate_path.endswith('.do'):#为模版文件
                 tplToken = truncate_path.replace('.do'  , '') [1:]
 

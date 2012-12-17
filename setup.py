@@ -27,7 +27,7 @@ setup(
     data_files = data_files,
 
     install_requires=[
-        "beautifulsoup4"
+
         ],
     
     entry_points = {

@@ -25,9 +25,13 @@ def readfile(filename  , mode='r'):
     return body
 
 def writefile(filename , content):
-    f = codecs.open(filename , 'w' , conf.getConfig()['encoding'])
-    f.write(content)
-    f.close()
+    try:
+        f = codecs.open(filename , 'w' , conf.getConfig()['encoding'])
+        f.write(content)
+        f.close()
+    except:
+        print filename,content
+        raise
     
 def copyfiles(sourceDir, targetDir):
     """拷贝文件夹

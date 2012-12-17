@@ -4,7 +4,6 @@
 import codecs
 import os
 import json
-from bs4 import BeautifulSoup
 import hashlib
 import re
 
@@ -20,9 +19,10 @@ import mgr
 
 
 jinjaenv = Environment( loader=FileSystemLoader( os.path.join( conf.getConfig()['path'], conf.getConfig()['template_dir']) ,  conf.getConfig()['encoding']) )
+build_jinjaenv = Environment( loader=FileSystemLoader( os.path.join( conf.getConfig()['path'] , 'build', conf.getConfig()['template_dir']) ,  conf.getConfig()['encoding']) )
 
 
-def parseTpl(token , data={} , noGetTpl = False):
+def parseTpl(token , data={} , noGetTpl = False , isbuild = False):
     """
     """
     if not noGetTpl:
@@ -33,7 +33,10 @@ def parseTpl(token , data={} , noGetTpl = False):
 
 
     if not noGetTpl:
-        body = jinjaenv.get_template(tpl)
+        if isbuild:
+            body = build_jinjaenv.get_template(tpl)
+        else:
+            body = jinjaenv.get_template(tpl)
     elif os.path.exists(tpl):
         body = Template(utils.readfile(tpl))
     else:
@@ -45,7 +48,6 @@ def parseTpl(token , data={} , noGetTpl = False):
         body = body.render(data)
     except TemplateNotFound as e:
         return 'Template %s not found' % (str(e) ,)
-        
     return body
 
 
@@ -65,21 +67,39 @@ def getFileTimeStamp(fpath):
     return ''
 
 
-def compileCommon(content):
+def compileCommon(filepath , token):
     """通用编译方法
     编译 @tm:file_path@为6位时间戳
     
     Arguments:
     - `content`:
     """
-    TM_TOKEN = '@tm:(.*)@'
+    if not os.path.exists(filepath):
+        return False
+    ftype = filepath.split('.')[-1]
+    if not ftype in ['html' , 'htm' , 'css' , 'js' , 'tpl']:
+        return False
+    content = utils.readfile( filepath )
+
+    TM_TOKEN = '@tm:(.*?)@'
+    COMMON_TOKEN = '@(.*?)@'
 
     iters = re.finditer( TM_TOKEN , content )
     for i in reversed(list(iters)):
         content = content[0:i.start(0)] + getFileTimeStamp(i.group(1)) + content[i.end(0):]
+
+    iters = re.finditer( COMMON_TOKEN , content )
+    for i in reversed(list(iters)):
+        config = conf.getConfig()
+        name = i.group(1)
+        value = config.get(name) or config[token].get(name)
+        if value:
+            content = content[0:i.start(0)] + value + content[i.end(0):]
+            
+
     return content
 
-def compileHTML(filepath):
+def compileHTML(filepath , needCompress):
     """编译html文件
     
     Arguments:
@@ -90,22 +110,26 @@ def compileHTML(filepath):
     tpl = utils.readfile( filepath )
 
     log.log( 'Compile for '+ filepath + '.' )
-    tpl = BeautifulSoup(tpl)
 
-    links = tpl.find_all('link')
-    scripts = tpl.find_all('script')
+    LINK_TOKEN = '<link.* href=[\'"](.*?\.css)[\'"]'
+    SCRIPT_TOKEN = '<script.* src=[\'"](.*?\.js)[\'"]'
 
     static_prefix = conf.getConfig()['static_prefix']
-    for link in links:
-        if link['rel'] and 'stylesheet' in link['rel']:
-            link['href'] = static_prefix + link['href'] + '?t=' + getFileTimeStamp(link['href'])
-    for script in scripts:
-        if 'src' in script and not script['src'].startswith('http'):
-            script['src'] = static_prefix + script['src'] + '?t=' + getFileTimeStamp(script['src'])
 
-            
-    tpl = tpl.prettify(formatter=None) # can set str(tpl) if need html minify
-    tpl = compileCommon(tpl)
+    iters = re.finditer( LINK_TOKEN , tpl )
+    for i in reversed(list(iters)):
+        path = i.group(1)
+        if not path.startswith('http'):
+            tpl =  tpl[0:i.start(1)] + static_prefix + i.group(1) + '?t=' + getFileTimeStamp( i.group(1) ) + tpl[i.end(1):]
+
+    iters = re.finditer( SCRIPT_TOKEN , tpl )
+    for i in reversed(list(iters)):
+        path = i.group(1)
+        if not path.startswith('http'):
+            tpl =  tpl[0:i.start(1)] + static_prefix + '?t=' + getFileTimeStamp( i.group(1) ) + tpl[i.end(1):]
+
+
+
     return tpl
 
 
@@ -120,9 +144,7 @@ def compileCss(filepath):
         imgpath = i.group(1)
         if not imgpath.startswith('http'):
             css = css[0:i.end(0)-1] + '?t=' + getFileTimeStamp( '/static/css/' + i.group(1)) + css[i.end(0)-1:]
-            print css
 
-    css = compileCommon(css)
     return css
     
     
