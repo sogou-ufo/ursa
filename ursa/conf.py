@@ -7,6 +7,9 @@ import json
 import utils
 import log
 
+
+PKG_OPEN = ['share' , 'auth']
+
 path = os.getcwd()
 encoding = 'utf-8'
 base = os.path.abspath(os.path.dirname(__file__)) 
