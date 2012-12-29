@@ -7,7 +7,7 @@ import json
 
 import utils
 import conf
-import parser
+import uparser as parser
 
 
 BASE = conf.getPath() + os.sep + '.data' + os.sep
@@ -71,7 +71,7 @@ def getPage(token):
     - `token`:
     """
     base = conf.getConfig()['base']
-    mgrTpl = os.path.join([ base , 'assets' , 'mgr' , 'index.html'])
+    mgrTpl = os.path.join( base , 'assets' , 'mgr' , 'index.html')
 
     body = parser.parseTpl(mgrTpl , {
             'name':token,

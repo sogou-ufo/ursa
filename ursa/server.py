@@ -37,7 +37,7 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             self.send_header("Location", body)
         self.end_headers()
         if response != 301:
-            self.wfile.write(body)
+            self.wfile.write(body.encode(conf.getConfig()['encoding']))
 
     def urlProxy(self , url , query):
         response = urllib2.urlopen(url + '?' + query)
@@ -64,7 +64,6 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         path_items = self.path.split('?')
         query = path_items[1] if len(path_items) > 1 else ''
         response = 200
-        print query
 
         serverConfig = conf.getConfig()
 
@@ -83,7 +82,7 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                 tplToken = truncate_path.replace('.do'  , '') [1:]
 
                 body = parser.parseTpl(tplToken)
-
+                body = parser.compileCommon(body , 'local' , True)
 
                 if len(body):
                     response,contentType = (200 , 'text/html')
@@ -92,7 +91,6 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             elif truncate_path.endswith('.m'):#为模版管理
                 tplToken = truncate_path.replace('.m' , '')[1:]
                 tpl = parser.parseTpl(tplToken)
-                print tpl
                 if len(tpl):
                     body = mgr.getPage(tplToken)
                     response,contentType,body = (200,'text/html' , body)

@@ -3,6 +3,7 @@
 
 import os
 import sys
+import time
 
 import utils
 import conf
@@ -76,6 +77,8 @@ def compileCommon(token):
 def run(params , options):
     """
     """
+    tmbegin = time.time()
+
     buildtype = None
     if params and len(params):
         if conf.getConfig().get(params[0]):
@@ -126,3 +129,4 @@ def run(params , options):
 
 
     log.success('Compile success.')
+    log.success('Time cost %s s.' % (time.time()-tmbegin) )

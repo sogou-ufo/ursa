@@ -67,19 +67,22 @@ def getFileTimeStamp(fpath):
     return ''
 
 
-def compileCommon(filepath , token):
+def compileCommon(filepath , token , force=True):
     """通用编译方法
     编译 @tm:file_path@为6位时间戳
     
     Arguments:
     - `content`:
     """
-    if not os.path.exists(filepath):
-        return False
-    ftype = filepath.split('.')[-1]
-    if not ftype in ['html' , 'htm' , 'css' , 'js' , 'tpl']:
-        return False
-    content = utils.readfile( filepath )
+    if force:
+        content = filepath
+    else:
+        if not os.path.exists(filepath):
+            return False
+        ftype = filepath.split('.')[-1]
+        if not ftype in ['html' , 'htm' , 'css' , 'js' , 'tpl']:
+            return False
+        content = utils.readfile( filepath )
 
     TM_TOKEN = '@tm:(.*?)@'
     COMMON_TOKEN = '@(.*?)@'
