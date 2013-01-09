@@ -27,7 +27,6 @@ def parseTpl(token , data={} , noGetTpl = False , isbuild = False):
     """
     if not noGetTpl:
         tpl = token + '.tpl'
-        dataFile = conf.getPath() + '/.data/' + token + '.json'
     else:
         tpl = token
 
@@ -67,7 +66,7 @@ def getFileTimeStamp(fpath):
     return ''
 
 
-def compileCommon(filepath , token , force=True):
+def compileCommon(filepath , token , force=False):
     """通用编译方法
     编译 @tm:file_path@为6位时间戳
     

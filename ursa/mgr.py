@@ -10,9 +10,9 @@ import conf
 import uparser as parser
 
 
-BASE = conf.getPath() + os.sep + '.data' + os.sep
+BASE = conf.getPath() + os.sep + '_data' + os.sep
 SUFFIX = '.json'
-COMMON_TOKEN = '.ursa'
+COMMON_TOKEN = '_ursa'
 
 def getRawData(token):
     """获取原始文件
