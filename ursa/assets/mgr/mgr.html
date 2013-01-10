@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Ursa Template Data Manager</title>
+        <style type="text/css" media="screen">
+            *{margin:0;padding:0;}
+            body{background:#333;color:#fff;font-size:14px;line-height:1.3;font-family:sans-serif;}
+            .wrapper{width:940px;margin:0 auto;padding:20px 0;}
+            h1{font-size:20px;}
+            #data{width:700px;height:500px;background:#eee;}
+            #submit{ margin-left:40px; }
+            .desc{padding-bottom:10px;}
+        </style>
+    </head>
+    <body>
+        <div class="wrapper">
+            
+            <h1>Data Manager for Tpl => {{name}}</h1>
+            <form method="post" id="ursa" action="/data.so">
+                <p class="desc">
+                    Paste or type json data in the textarea below.
+                    <button id="submit" type="submit">Submit</button>
+
+                </p>
+                <input type="hidden" name="tpl" value="{{name}}" />
+                <textarea name="data" id="data" >{{data}}</textarea>
+            </form>
+        </div>
+    </body>
+</html>

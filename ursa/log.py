@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
+import sys
+
 bcolors = {
     'HEADER':'\033[95m',
     'OKBLUE':'\033[94m',
@@ -10,34 +12,34 @@ bcolors = {
     'ENDC': '\033[0m'
 }
 
-def warn(str):
+def warn(str , noNewLine = False):
     """
     
     Arguments:
     - `str`:
     """
-    print bcolors['WARNING'] + str + bcolors['ENDC']
+    sys.stdout.write(bcolors['WARNING'] + str + bcolors['ENDC'] + ('' if noNewLine else '\n'))
 
 
 
-def error(str):
+def error(str , noNewLine = False):
     """
     
     Arguments:
     - `str`:
     """
     
-    print bcolors['FAIL'] + str + bcolors['ENDC']
+    sys.stdout.write(bcolors['FAIL'] + str + bcolors['ENDC'] + ('' if noNewLine else '\n'))
 
-def log(str):
+def log(str , noNewLine = False):
     """
     
     Arguments:
     - `str`:
     """
-    print bcolors['OKBLUE'] + str + bcolors['ENDC']
+    sys.stdout.write(bcolors['OKBLUE'] + str + bcolors['ENDC']  + ('' if noNewLine else '\n'))
 
-def success(str):
+def success(str , noNewLine = False):
     """
     """
-    print bcolors['OKGREEN'] + str + bcolors['ENDC']
+    sys.stdout.write(bcolors['OKGREEN'] + str + bcolors['ENDC'] + ('' if noNewLine else '\n'))

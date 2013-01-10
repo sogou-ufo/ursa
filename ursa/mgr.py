@@ -71,7 +71,7 @@ def getPage(token):
     - `token`:
     """
     base = conf.getConfig()['base']
-    mgrTpl = os.path.join( base , 'assets' , 'mgr' , 'index.html')
+    mgrTpl = os.path.join( base , 'assets' , 'mgr' , 'mgr.html')
 
     body = parser.parseTpl(mgrTpl , {
             'name':token,
@@ -80,4 +80,17 @@ def getPage(token):
 
     return body
     
+def getIndex():
+    base = conf.getConfig()['base']
+    indexTpl = os.path.join( base , 'assets' , 'mgr' , 'index.html' )
+
+    path = conf.getConfig()['path']
     
+    tpls = []
+    for dirpath , dirnames , filenames  in os.walk( os.path.join( path , 'template' ) ):
+        tpls.extend([ f.replace('.tpl' , '') for f in filenames if f.endswith('.tpl')  ])
+
+    body = parser.parseTpl( indexTpl , {
+            'tpls':tpls
+            } , True )
+    return body

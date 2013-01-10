@@ -52,7 +52,8 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         except:
             return ('text/html;charset=utf-8' , "Unexpected error:"+ str(sys.exc_info()))
         
-
+    def log_request(self , code , message=None):#disable log
+        return ''
     
     def do_GET(self):
         """
@@ -67,6 +68,8 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
         serverConfig = conf.getConfig()
 
+
+
         isInServerConfig = False
         if 'proxy' in serverConfig:
             for reg,target in serverConfig['proxy'].items():
@@ -78,7 +81,10 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                         contentType , body = self.pluginsProxy(target , query)
 
         if not isInServerConfig:
-            if truncate_path.endswith('.do'):#为模版文件
+            if truncate_path == '/':#default page
+                body = mgr.getIndex()
+                response,contentType,body = (200 , 'text/html' , body)
+            elif truncate_path.endswith('.do'):#为模版文件
                 tplToken = truncate_path.replace('.do'  , '') [1:]
 
                 body = parser.parseTpl(tplToken)
@@ -108,7 +114,7 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         try:
             data = json.loads(body['data'])
             mgr.setData( tpl , data )
-            self.sendResponseWithOutput( 200 , 'text/html' , 'Add Data Success.' )
+            self.sendResponseWithOutput( 301 , 'text/html' , '/' + tpl + '.do' )
         except ValueError:  
             self.sendResponseWithOutput( 200 , 'text/html' , 'Json format error' )
         except:

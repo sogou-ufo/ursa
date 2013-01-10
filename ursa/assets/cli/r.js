@@ -18,7 +18,7 @@ document, importScripts, self, location */
 
 var requirejs, require, define;
 (function (console, args, readFileFunc) {
-
+    console && (console.log = function(){});
     var fileName, env, fs, vm, path, exec, rhinoContext, dir, nodeRequire,
         nodeDefine, exists, reqMain, loadedOptimizedLib, existsForNode,
         version = '2.1.2+ Wed, 05 Dec 2012 21:49:23 GMT',

@@ -4,6 +4,7 @@
 import os
 import sys
 import time
+import subprocess
 
 import utils
 import conf
@@ -101,8 +102,8 @@ def run(params , options):
 
     try:
         log.log( 'Combine css&js with r.js' )
-        os.system( 'node ' + RJSPATH +' -o name=main out='+ mainjs + ' optimize=none baseUrl=' + os.path.join(PATH , BUILD_DIR , 'static' , 'js') )
-        os.system( 'node ' + RJSPATH + ' -o cssIn=' + maincss + ' out=' + maincss )
+        subprocess.call( 'node ' + RJSPATH +' -o name=main out='+ mainjs + ' optimize=none baseUrl=' + os.path.join(PATH , BUILD_DIR , 'static' , 'js')  , shell=True)
+        subprocess.call( 'node ' + RJSPATH + ' -o cssIn=' + maincss + ' out=' + maincss  , shell=True)
         log.success( 'Combine css&js with r.js success.' )
     except:
         log.error('Please insure you have install r.js on your computer')
@@ -110,22 +111,30 @@ def run(params , options):
     
 
     if options.get('compress'):
-        log.log('Begin to compile Js')
-        os.system( 'java -jar ' + YCPATH + ' --type js --charset ' + conf.getConfig()['encoding'] + ' ' + mainjs + ' -o ' + mainjs );
-        log.log('Begin to compile Css')
-        os.system( 'java -jar ' + YCPATH + ' --type css --charset ' + conf.getConfig()['encoding'] + ' ' + maincss + ' -o ' + maincss );
+        log.log('Begin to compile Js...' , True)
+        subprocess.call( 'java -jar ' + YCPATH + ' --type js --charset ' + conf.getConfig()['encoding'] + ' ' + mainjs + ' -o ' + mainjs , shell=True );
+        log.success('Success!')
+        log.log('Begin to compile Css...' , True)
+        subprocess.call( 'java -jar ' + YCPATH + ' --type css --charset ' + conf.getConfig()['encoding'] + ' ' + maincss + ' -o ' + maincss , shell=True);
+        log.success('Success!')
     if options.get('html'):
         utils.createfolder( os.path.join( BUILD_DIR ,  'html'))
         
 
-    log.log('Begin to compile tpls')
+    log.log('Begin to compile tpls...' )
     compileHTML(options.get('compress') , options.get('html'))
-    log.log('Begin to addTimestamps')
+    log.success('Success!')
+    
+    log.log('Begin to addTimestamps...' , True)
     compileCss();
 
-    log.log('Begin to replace all token')
+    log.success('Success!')
+
+
+    log.log('Begin to replace all token...', True)
 
     compileCommon(buildtype)
+    log.success('Success!')
 
 
     log.success('Compile success.')
