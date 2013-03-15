@@ -32,12 +32,13 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         """
         self.send_response(response)
         self.send_header("Content-Type", contentType)
-        self.send_header("Content-Length", len(body))
         if response == 301:
             self.send_header("Location", body)
+        body = body.encode(conf.getConfig()['encoding']);
+        self.send_header("Content-Length", len(body))
         self.end_headers()
         if response != 301:
-            self.wfile.write(body.encode(conf.getConfig()['encoding']))
+            self.wfile.write(body)
 
     def urlProxy(self , url , query):
         response = urllib2.urlopen(url + '?' + query)
@@ -132,11 +133,11 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             stat_result = os.stat(file_path)    
             mime_type, encoding = mimetypes.guess_type(file_path)
 
-            file = open(file_path, "rb")
+            f = codecs.open(file_path, "rb" , conf.getConfig()['encoding'])
             try:
-                return (200, mime_type, file.read())
+                return (200, mime_type, f.read())
             finally:
-                file.close()
+                f.close()
             
         elif os.path.isdir(file_path):
             if file_path.endswith('/'):

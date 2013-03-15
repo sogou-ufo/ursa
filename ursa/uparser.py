@@ -94,7 +94,7 @@ def compileCommon(filepath , token , force=False):
     for i in reversed(list(iters)):
         config = conf.getConfig()
         name = i.group(1)
-        value = config.get(name) or config[token].get(name)
+        value = config.get(name) or ( token and config[token].get(name))
         if value:
             content = content[0:i.start(0)] + value + content[i.end(0):]
             

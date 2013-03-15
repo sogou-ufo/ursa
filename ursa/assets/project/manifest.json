@@ -1,4 +1,4 @@
 {
-    "static_prefix":"http://p{num}.sogou.com/",
+    "static_prefix":".",
     "local":{}
 }
