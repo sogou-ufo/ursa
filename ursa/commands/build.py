@@ -129,10 +129,12 @@ def run(params , options):
 
     log.success('Success!')
 
+
     log.log('Begin to replace all token...', True)
 
     compileCommon(buildtype)
     log.success('Success!')
+
 
 
     log.success('Compile success.')
