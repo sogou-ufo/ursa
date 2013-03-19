@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8" />
         <title>{% block page_title %}{% endblock %}</title>
-        <link rel="stylesheet" href="/static/css/main.css" type="text/css" />
+        <link rel="stylesheet" href="@static_prefix@/static/css/main.css" type="text/css" />
     </head>
     <body {% block body_class %}{% endblock %}>
         {% block content %}{% endblock %}

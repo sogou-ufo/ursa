@@ -34,7 +34,8 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         self.send_header("Content-Type", contentType)
         if response == 301:
             self.send_header("Location", body)
-        body = body.encode(conf.getConfig()['encoding']);
+        if contentType.find('image') != 0:
+            body = body.encode(conf.getConfig()['encoding']);
         self.send_header("Content-Length", len(body))
         self.end_headers()
         if response != 301:
@@ -132,10 +133,15 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         if os.path.isfile(file_path):
             stat_result = os.stat(file_path)    
             mime_type, encoding = mimetypes.guess_type(file_path)
-
-            f = codecs.open(file_path, "rb" , conf.getConfig()['encoding'])
+            
+            if mime_type.find('image')==0:
+                f = open(file_path , 'rb')
+                fcontent = f.read()
+            else:
+                f = codecs.open(file_path, "rb" , conf.getConfig()['encoding'])
+                fcontent = parser.compileCommon(f.read() , 'local' , True)
             try:
-                return (200, mime_type, f.read())
+                return (200, mime_type, fcontent)
             finally:
                 f.close()
             

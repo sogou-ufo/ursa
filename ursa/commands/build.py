@@ -119,7 +119,12 @@ def run(params , options):
         log.success('Success!')
     if options.get('html'):
         utils.createfolder( os.path.join( BUILD_DIR ,  'html'))
-        
+
+    log.log('Begin to replace all token...', True)
+
+    compileCommon(buildtype)
+    log.success('Success!')
+
 
     log.log('Begin to compile tpls...' )
     compileHTML(options.get('compress') , options.get('html'))
@@ -130,11 +135,6 @@ def run(params , options):
 
     log.success('Success!')
 
-
-    log.log('Begin to replace all token...', True)
-
-    compileCommon(buildtype)
-    log.success('Success!')
 
 
     log.success('Compile success.')

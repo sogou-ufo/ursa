@@ -56,7 +56,9 @@ def getFileTimeStamp(fpath):
     Arguments:
     - `fpath`:
     """
-    fpath = conf.getConfig()['path'] + fpath  #may cause problem in windows
+    if fpath.find('/') == 0:
+        fpath = fpath[1:]
+    fpath = os.path.join(conf.getConfig()['path'] , fpath)  
     if os.path.exists( fpath ):
         f = utils.readfile(fpath , 'rb')
         m = hashlib.md5()
@@ -82,7 +84,6 @@ def compileCommon(filepath , token , force=False):
         if not ftype in ['html' , 'htm' , 'css' , 'js' , 'tpl']:
             return False
         content = utils.readfile( filepath )
-
     TM_TOKEN = '@tm:(.*?)@'
     COMMON_TOKEN = '@(.*?)@'
 
@@ -94,7 +95,7 @@ def compileCommon(filepath , token , force=False):
     for i in reversed(list(iters)):
         config = conf.getConfig()
         name = i.group(1)
-        value = config.get(name) or ( token and config[token].get(name))
+        value = ( token and config[token].get(name)) or config.get(name) 
         if value:
             content = content[0:i.start(0)] + value + content[i.end(0):]
             
@@ -116,19 +117,17 @@ def compileHTML(filepath , needCompress):
     LINK_TOKEN = '<link.* href=[\'"](.*?\.css)[\'"]'
     SCRIPT_TOKEN = '<script.* src=[\'"](.*?\.js)[\'"]'
 
-    static_prefix = conf.getConfig()['static_prefix']
-
     iters = re.finditer( LINK_TOKEN , tpl )
     for i in reversed(list(iters)):
         path = i.group(1)
         if not path.startswith('http'):
-            tpl =  tpl[0:i.start(1)] + static_prefix + i.group(1) + '?t=' + getFileTimeStamp( i.group(1) ) + tpl[i.end(1):]
+            tpl =  tpl[0:i.start(1)] +  i.group(1) + '?t=' + getFileTimeStamp( i.group(1) ) + tpl[i.end(1):]
 
     iters = re.finditer( SCRIPT_TOKEN , tpl )
     for i in reversed(list(iters)):
         path = i.group(1)
         if not path.startswith('http'):
-            tpl =  tpl[0:i.start(1)] + static_prefix + '?t=' + getFileTimeStamp( i.group(1) ) + tpl[i.end(1):]
+            tpl =  tpl[0:i.start(1)] +  i.group(1) + '?t=' + getFileTimeStamp( i.group(1) ) + tpl[i.end(1):]
 
 
 
