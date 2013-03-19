@@ -120,14 +120,16 @@ def compileHTML(filepath , needCompress):
     iters = re.finditer( LINK_TOKEN , tpl )
     for i in reversed(list(iters)):
         path = i.group(1)
+        path = compileCommon(path , 'local' , True) #内部可能有替换的变量
         if not path.startswith('http'):
-            tpl =  tpl[0:i.start(1)] +  i.group(1) + '?t=' + getFileTimeStamp( i.group(1) ) + tpl[i.end(1):]
+            tpl =  tpl[0:i.start(1)] +  i.group(1) + '?t=' + getFileTimeStamp( path ) + tpl[i.end(1):]
 
     iters = re.finditer( SCRIPT_TOKEN , tpl )
     for i in reversed(list(iters)):
         path = i.group(1)
+        path = compileCommon(path , 'local' , True) #内部可能有替换的变量
         if not path.startswith('http'):
-            tpl =  tpl[0:i.start(1)] +  i.group(1) + '?t=' + getFileTimeStamp( i.group(1) ) + tpl[i.end(1):]
+            tpl =  tpl[0:i.start(1)] +  i.group(1) + '?t=' + getFileTimeStamp( path ) + tpl[i.end(1):]
 
 
 
@@ -143,8 +145,9 @@ def compileCss(filepath):
     iters = re.finditer( IMG_TOKEN , css )
     for i in reversed(list(iters)):
         imgpath = i.group(1)
+        imgpath = compileCommon(imgpath , 'local' , True) #内部可能有替换的变量
         if not imgpath.startswith('http'):
-            css = css[0:i.end(0)-1] + '?t=' + getFileTimeStamp( '/static/css/' + i.group(1)) + css[i.end(0)-1:]
+            css = css[0:i.end(0)-1] + '?t=' + getFileTimeStamp( imgpath ) + css[i.end(0)-1:]
 
     return css
     
