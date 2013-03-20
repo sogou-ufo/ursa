@@ -86,8 +86,8 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             if truncate_path == '/':#default page
                 body = mgr.getIndex()
                 response,contentType,body = (200 , 'text/html' , body)
-            elif truncate_path.endswith('.do'):#为模版文件
-                tplToken = truncate_path.replace('.do'  , '') [1:]
+            elif truncate_path.endswith('.ut'):#为模版文件
+                tplToken = truncate_path.replace('.ut'  , '') [1:]
 
                 body = parser.parseTpl(tplToken)
                 body = parser.compileCommon(body , 'local' , True)
@@ -116,7 +116,7 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         try:
             data = json.loads(body['data'])
             mgr.setData( tpl , data )
-            self.sendResponseWithOutput( 301 , 'text/html' , '/' + tpl + '.do' )
+            self.sendResponseWithOutput( 301 , 'text/html' , '/' + tpl + '.ut' )
         except ValueError:  
             self.sendResponseWithOutput( 200 , 'text/html' , 'Json format error' )
         except:
