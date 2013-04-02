@@ -17,8 +17,9 @@ import log
 import mgr
 
 
+range_item = 0
 
-jinjaenv = Environment( loader=FileSystemLoader( os.path.join( conf.getConfig()['path'], conf.getConfig()['template_dir']) ,  conf.getConfig()['encoding']) )
+jinjaenv = Environment( loader=FileSystemLoader( os.path.join( conf.getConfig()['path'], conf.getConfig()['template_dir']) ,  conf.getConfig()['encoding']) , extensions=["jinja2.ext.do"] )
 build_jinjaenv = Environment( loader=FileSystemLoader( os.path.join( conf.getConfig()['path'] , 'build', conf.getConfig()['template_dir']) ,  conf.getConfig()['encoding']) )
 
 
@@ -92,11 +93,28 @@ def compileCommon(filepath , token , force=False):
         content = content[0:i.start(0)] + getFileTimeStamp(i.group(1)) + content[i.end(0):]
 
     iters = re.finditer( COMMON_TOKEN , content )
+
     for i in reversed(list(iters)):
         config = conf.getConfig()
         name = i.group(1)
         value = ( token and config[token].get(name)) or config.get(name) 
         if value:
+            if value.find('{num}') != -1:
+                num = ( token and config[token].get('num')) or config.get('num') or '10'
+                num = range(num+1)
+                substr100 = content[i.end(0):i.end(0)+100]
+                istimestamp = substr100.find('t=')
+                if istimestamp != -1:#has timestamp
+                    tm = int(substr100[istimestamp+2:istimestamp+3])
+                    if tm >= len(num):
+                        tm = tm - len(num)
+                    value = value.replace( '{num}' , str(tm) )
+                else:
+                    global range_item
+                    value = value.replace( '{num}' , str(num[range_item]) )
+                    range_item = range_item + 1
+                    if range_item >= len(num):
+                        range_item = 0
             content = content[0:i.start(0)] + value + content[i.end(0):]
             
 
