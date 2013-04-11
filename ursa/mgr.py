@@ -9,10 +9,27 @@ import utils
 import conf
 import uparser as parser
 
+import re
 
 BASE = conf.getPath() + os.sep + '_data' + os.sep
 SUFFIX = '.json'
 COMMON_TOKEN = '_ursa'
+
+def dorepeat(data):
+    if type(data)==type({}):
+        for item in data.keys():
+            dorepeat(data[item])
+            if re.search( '@\d+$' , item ):
+                name = item.split('@')[0]
+                times = item.split('@')[1]
+                
+                if int(times):
+                    for time in range(int(times)):
+                        if not data.get(name):
+                            data[name] = []
+                        data[name].append(data[item])
+
+        
 
 def getRawData(token):
     """获取原始文件
@@ -38,6 +55,8 @@ def getData(token):
         data = json.loads(data)
     else:
         data = {}
+
+    dorepeat(data);
     
     commonpath = BASE + COMMON_TOKEN + SUFFIX
     if os.path.exists(commonpath):

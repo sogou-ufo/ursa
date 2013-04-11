@@ -48,6 +48,8 @@ def parseTpl(token , data={} , noGetTpl = False , isbuild = False):
         body = body.render(data)
     except TemplateNotFound as e:
         return 'Template %s not found' % (str(e) ,)
+    except:
+        return ''
     return body
 
 
@@ -59,7 +61,8 @@ def getFileTimeStamp(fpath):
     """
     if fpath.find('/') == 0:
         fpath = fpath[1:]
-    fpath = os.path.join(conf.getConfig()['path'] , fpath)  
+    fpath = os.path.join(conf.getConfig()['path'] , 'build' , fpath)  
+
     if os.path.exists( fpath ):
         f = utils.readfile(fpath , 'rb')
         m = hashlib.md5()
