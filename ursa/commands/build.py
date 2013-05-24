@@ -15,6 +15,7 @@ BUILD_DIR = 'build'
 PATH = conf.getConfig()['path'] 
 RJSPATH = os.path.join(conf.getConfig()['base'] , 'assets' , 'cli' , 'r.js')
 YCPATH = os.path.join(conf.getConfig()['base'] , 'assets' , 'cli' , 'yuicompressor.jar')
+COMPILE_FOLDER = conf.getConfig().get('compile_folder')
 
 options = [ 
     {
@@ -37,6 +38,10 @@ def compileHTML( needCompress = False , needHtml = False ):
     tplfiles = []
     for dirpath , dirnames , filenames  in os.walk(base):
         tplfiles.extend([ os.path.join( dirpath , f ) for f in filenames if f.endswith('.tpl')  ])
+    if COMPILE_FOLDER:
+        for dirpath , dirnames , filenames  in os.walk(os.path.join(PATH , 'build' , COMPILE_FOLDER)):
+            tplfiles.extend([ os.path.join( dirpath , f ) for f in filenames  ])
+        
     for tpl in tplfiles:
         f = parser.compileHTML(tpl , needCompress)
         utils.writefile(tpl , f)
@@ -96,13 +101,19 @@ def run(params , options):
     
     utils.copyfiles( 'template' , os.path.join(BUILD_DIR , 'template') )
     utils.copyfiles( 'static' , os.path.join(BUILD_DIR , 'static') )
+    
+    if COMPILE_FOLDER:
+        utils.copyfiles( COMPILE_FOLDER , os.path.join(BUILD_DIR , COMPILE_FOLDER) )
+        
+    require_modules = conf.getConfig().get('require_modules') or ['main']
 
-    mainjs  = os.path.join( PATH , BUILD_DIR , 'static' , 'js' , 'main.js' )
     maincss  = os.path.join( PATH , BUILD_DIR , 'static' , 'css' , 'main.css' )
 
     try:
         log.log( 'Combine css&js with r.js' )
-        subprocess.call( 'node ' + RJSPATH +' -o name=main out='+ mainjs + ' optimize=none baseUrl=' + os.path.join(PATH , BUILD_DIR , 'static' , 'js')  , shell=True)
+        for module in require_modules:
+            js = os.path.join(PATH, BUILD_DIR , 'static' , 'js' , module + '.js' )
+            subprocess.call( 'node ' + RJSPATH +' -o name=' + module + ' out='+ js + ' optimize=none baseUrl=' + os.path.join(PATH , BUILD_DIR , 'static' , 'js')  , shell=True)
         subprocess.call( 'node ' + RJSPATH + ' -o cssIn=' + maincss + ' out=' + maincss  , shell=True)
         log.success( 'Combine css&js with r.js success.' )
     except:
@@ -110,13 +121,6 @@ def run(params , options):
         raise
     
 
-    if options.get('compress'):
-        log.log('Begin to compile Js...' , True)
-        subprocess.call( 'java -jar ' + YCPATH + ' --type js --charset ' + conf.getConfig()['encoding'] + ' ' + mainjs + ' -o ' + mainjs , shell=True );
-        log.success('Success!')
-        log.log('Begin to compile Css...' , True)
-        subprocess.call( 'java -jar ' + YCPATH + ' --type css --charset ' + conf.getConfig()['encoding'] + ' ' + maincss + ' -o ' + maincss , shell=True);
-        log.success('Success!')
     if options.get('html'):
         utils.createfolder( os.path.join( BUILD_DIR ,  'html'))
 
@@ -135,6 +139,13 @@ def run(params , options):
     compileCommon(buildtype)
     log.success('Success!')
 
+    if options.get('compress'):
+        log.log('Begin to compile Js...' , True)
+        subprocess.call( 'java -jar ' + YCPATH + ' --type js --charset ' + conf.getConfig()['encoding'] + ' ' + mainjs + ' -o ' + mainjs , shell=True );
+        log.success('Success!')
+        log.log('Begin to compile Css...' , True)
+        subprocess.call( 'java -jar ' + YCPATH + ' --type css --charset ' + conf.getConfig()['encoding'] + ' ' + maincss + ' -o ' + maincss , shell=True);
+        log.success('Success!')
 
 
     log.success('Compile success.')

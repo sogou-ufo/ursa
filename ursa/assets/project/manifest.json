@@ -1,4 +1,5 @@
 {
     "static_prefix":".",
+    "require_modules":["main"],
     "local":{}
 }

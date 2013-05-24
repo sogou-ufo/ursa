@@ -32,17 +32,22 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         """
         self.send_response(response)
         self.send_header("Content-Type", contentType)
+
         if response == 301:
             self.send_header("Location", body)
-        if not contentType or contentType.find('image') != 0:
-            body = body.encode(conf.getConfig()['encoding']);
+        if not contentType or (contentType.find('image') != 0 and contentType.find('flash')==-1):
+            try:
+                body = body.encode(conf.getConfig()['encoding']);
+            except UnicodeDecodeError:
+                body = body
         self.send_header("Content-Length", len(body))
         self.end_headers()
         if response != 301:
             self.wfile.write(body)
 
     def urlProxy(self , url , query):
-        response = urllib2.urlopen(url + '?' + query)
+        url = url if url.find('?')!=-1 else (url + '?')
+        response = urllib2.urlopen(url + query)
         contentType = response.info()['Content-Type']
         body = response.read()
         return (contentType,body)
@@ -88,7 +93,6 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                 response,contentType,body = (200 , 'text/html' , body)
             elif truncate_path.endswith('.ut'):#为模版文件
                 tplToken = truncate_path.replace('.ut'  , '') [1:]
-
                 body = parser.parseTpl(tplToken)
                 body = parser.compileCommon(body , 'local' , True)
 
@@ -133,8 +137,8 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         if os.path.isfile(file_path):
             stat_result = os.stat(file_path)    
             mime_type, encoding = mimetypes.guess_type(file_path)
-            
-            if mime_type and mime_type.find('image')==0:
+
+            if mime_type and (mime_type.find('image')==0 or mime_type.find('flash')!=-1):
                 f = open(file_path , 'rb')
                 fcontent = f.read()
             else:

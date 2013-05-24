@@ -1,0 +1,4 @@
+20130524
+优化了项目初始化时候脚本加载方式
+支持多脚本文件优化，manifest中加入require_modules即可
+升级ufo2.js为ursa.js,包含jquery-1.9.1.min.js  jquery.cookie.js  jquery.json.js    require.js  underscore-min.js 

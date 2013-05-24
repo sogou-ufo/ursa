@@ -107,7 +107,11 @@ def getIndex():
     
     tpls = []
     for dirpath , dirnames , filenames  in os.walk( os.path.join( path , 'template' ) ):
-        tpls.extend([ f.replace('.tpl' , '') for f in filenames if f.endswith('.tpl')  ])
+        for f in filenames:
+            if f.endswith('.tpl'):
+                tpldir = dirpath.replace( os.path.join( path , 'template' ) , '' )
+                url = '/'.join( [ tpldir , f.replace('.tpl' , '') ] )
+            tpls.extend([ url[1:] ])
 
     body = parser.parseTpl( indexTpl , {
             'tpls':tpls

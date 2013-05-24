@@ -19,7 +19,7 @@ import mgr
 
 range_item = 0
 
-jinjaenv = Environment( loader=FileSystemLoader( os.path.join( conf.getConfig()['path'], conf.getConfig()['template_dir']) ,  conf.getConfig()['encoding']) , extensions=["jinja2.ext.do"] )
+jinjaenv = Environment( loader=FileSystemLoader( os.path.join( conf.getConfig()['path'], conf.getConfig()['template_dir']) ,  conf.getConfig()['encoding']) , extensions=["jinja2.ext.do"] , autoescape=True )
 build_jinjaenv = Environment( loader=FileSystemLoader( os.path.join( conf.getConfig()['path'] , 'build', conf.getConfig()['template_dir']) ,  conf.getConfig()['encoding']) )
 
 
@@ -48,7 +48,8 @@ def parseTpl(token , data={} , noGetTpl = False , isbuild = False):
         body = body.render(data)
     except TemplateNotFound as e:
         return 'Template %s not found' % (str(e) ,)
-    except:
+    except Exception as e:
+        print e
         return ''
     return body
 
@@ -85,7 +86,7 @@ def compileCommon(filepath , token , force=False):
         if not os.path.exists(filepath):
             return False
         ftype = filepath.split('.')[-1]
-        if not ftype in ['html' , 'htm' , 'css' , 'js' , 'tpl']:
+        if not ftype in ['html' , 'htm' , 'css' , 'js' , 'tpl' , 'jsp']:
             return False
         content = utils.readfile( filepath )
     TM_TOKEN = '@tm:(.*?)@'
@@ -108,7 +109,10 @@ def compileCommon(filepath , token , force=False):
                 substr100 = content[i.end(0):i.end(0)+100]
                 istimestamp = substr100.find('t=')
                 if istimestamp != -1:#has timestamp
-                    tm = int(substr100[istimestamp+2:istimestamp+3])
+                    try:
+                        tm = int(substr100[istimestamp+2:istimestamp+3])
+                    except ValueError:
+                        continue
                     if tm >= len(num):
                         tm = tm - len(num)
                     value = value.replace( '{num}' , str(tm) )

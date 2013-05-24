@@ -1,4 +1,4 @@
-define([] , function(){
+define('main', [] , function(){
 
 
 
