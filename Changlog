@@ -1,3 +1,8 @@
+20130527 
+支持ursa init mobile
+对移动端项目的支持
+注意移动端使用的almond.js，编译后不可动态require
+
 20130524
 优化了项目初始化时候脚本加载方式
 支持多脚本文件优化，manifest中加入require_modules即可

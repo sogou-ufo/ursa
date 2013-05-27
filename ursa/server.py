@@ -96,6 +96,9 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                 body = parser.parseTpl(tplToken)
                 body = parser.compileCommon(body , 'local' , True)
 
+                if conf.getConfig().get('type') and conf.getConfig()['type'] == 'mobile':
+                    body = body.replace('mursa.js' , 'ursa.js')  #mobile project
+
                 if len(body):
                     response,contentType = (200 , 'text/html')
                 else:

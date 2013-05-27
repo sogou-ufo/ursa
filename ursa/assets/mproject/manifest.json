@@ -1,0 +1,6 @@
+{
+    "static_prefix":".",
+    "require_modules":["main"],
+    "type":"mobile",
+    "local":{}
+}
