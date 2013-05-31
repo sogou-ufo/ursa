@@ -1,3 +1,8 @@
+20130529
+修改有目录的token为 a.b.c
+增加_folder变量，为根目录
+增加_subtoken变量，为目录下名称
+
 20130527 
 支持ursa init mobile
 对移动端项目的支持

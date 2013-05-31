@@ -49,9 +49,19 @@ def compileHTML( needCompress = False , needHtml = False ):
     if needHtml:
         log.log('Render html file.\nIt will under build folder.')
         files = os.listdir( os.path.join( base ) )
-        for fname in files:
-            token = fname.split('.')[0]
-            html = parser.parseTpl(token , isbuild=True)
+        tplfiles = []
+        for dirpath , dirnames, filenames in os.walk(base):
+            tplfiles.extend( [ os.path.join(dirpath , f) for f in filenames if f.endswith('.tpl') ] )
+        for fname in tplfiles:
+            token = fname.replace( base + '/' , '' ).replace('.tpl' , '')
+            html = parser.parseTpl(token  , isbuild=True)
+            
+            if token.find('/') != -1:
+                subfolder = os.path.join(PATH , 'build' , 'html'  , token.split('/')[0])
+                if not os.path.exists(subfolder):
+
+                    utils.createfolder(subfolder)
+            
             utils.writefile( os.path.join(PATH , 'build' , 'html' , token + '.html' ) , html )
         log.success('Render html success');
         
@@ -141,7 +151,9 @@ def run(params , options):
 
     if options.get('compress'):
         log.log('Begin to compile Js...' , True)
-        subprocess.call( 'java -jar ' + YCPATH + ' --type js --charset ' + conf.getConfig()['encoding'] + ' ' + mainjs + ' -o ' + mainjs , shell=True );
+        for module in require_modules:
+            js = os.path.join(PATH, BUILD_DIR , 'static' , 'js' , module + '.js' )
+            subprocess.call( 'java -jar ' + YCPATH + ' --type js --charset ' + conf.getConfig()['encoding'] + ' ' + js + ' -o ' + js , shell=True );
         log.success('Success!')
         log.log('Begin to compile Css...' , True)
         subprocess.call( 'java -jar ' + YCPATH + ' --type css --charset ' + conf.getConfig()['encoding'] + ' ' + maincss + ' -o ' + maincss , shell=True);

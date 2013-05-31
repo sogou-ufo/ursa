@@ -65,7 +65,12 @@ def getData(token):
         commondata = {}
     
     data.update(commondata)
-    data.update({'_token':token})
+    
+    multoken = token.split('/')
+
+    data.update({'_token':token.replace('/','_')})
+    data.update({'_folder':multoken[0]})
+    data.update({'_subtoken':multoken[1] if len(multoken)>1 else ""})
     return data
 
 

@@ -178,3 +178,20 @@ def compileCss(filepath):
     
     
 
+def compilePlugin(name,content):
+    plugins = conf.getConfig().get('serverplugins')
+    if not plugins:
+        return content
+
+    for plugin in plugins:
+        try:
+            pkg = __import__( plugin , globals() , locals() , ['main'] , -1 )
+            content= pkg.main(name,content)
+        except Exception as e:
+            print "Plugin " + plugin + " is invalid"
+            print e
+            content = content
+
+    return content
+    
+    
