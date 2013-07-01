@@ -116,7 +116,6 @@ def run(params , options):
         utils.copyfiles( COMPILE_FOLDER , os.path.join(BUILD_DIR , COMPILE_FOLDER) )
         
     require_modules = conf.getConfig().get('require_modules') or ['main']
-
     maincss  = os.path.join( PATH , BUILD_DIR , 'static' , 'css' , 'main.css' )
 
     try:

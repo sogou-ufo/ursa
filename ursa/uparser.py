@@ -54,7 +54,7 @@ def parseTpl(token , data={} , noGetTpl = False , isbuild = False):
     return body
 
 
-def getFileTimeStamp(fpath):
+def getFileTimeStamp(fpath,parentpath=''):
     """为文件加上时间戳并返回
     
     Arguments:
@@ -62,10 +62,14 @@ def getFileTimeStamp(fpath):
     """
     if fpath.find('/') == 0:
         fpath = fpath[1:]
-    fpath = os.path.join(conf.getConfig()['path'] , 'build' , fpath)  
+    fpath2 = os.path.join(conf.getConfig()['path'] , 'build' , fpath)  
+    if not os.path.exists( fpath2 ) and parentpath:
+        parentpath = parentpath.split('/')
+        parentpath.pop()
+        fpath2 = '/'.join(parentpath) + '/' + fpath
 
-    if os.path.exists( fpath ):
-        f = utils.readfile(fpath , 'rb')
+    if os.path.exists( fpath2 ):
+        f = utils.readfile(fpath2 , 'rb')
         m = hashlib.md5()
         m.update(f)
         md5 = utils.md5toInt(m.hexdigest())
@@ -94,7 +98,7 @@ def compileCommon(filepath , token , force=False):
 
     iters = re.finditer( TM_TOKEN , content )
     for i in reversed(list(iters)):
-        content = content[0:i.start(0)] + getFileTimeStamp(i.group(1)) + content[i.end(0):]
+        content = content[0:i.start(0)] + getFileTimeStamp(i.group(1) , filepath) + content[i.end(0):]
 
     iters = re.finditer( COMMON_TOKEN , content )
 
@@ -146,15 +150,15 @@ def compileHTML(filepath , needCompress):
     for i in reversed(list(iters)):
         path = i.group(1)
         path = compileCommon(path , 'local' , True) #内部可能有替换的变量
-        if not path.startswith('http'):
-            tpl =  tpl[0:i.start(1)] +  i.group(1) + '?t=' + getFileTimeStamp( path ) + tpl[i.end(1):]
+        if not path.startswith('http') and not conf.getConfig()['disableAutoTimestamp']:
+            tpl =  tpl[0:i.start(1)] +  i.group(1) + '?t=' + getFileTimeStamp( path , filepath ) + tpl[i.end(1):]
 
     iters = re.finditer( SCRIPT_TOKEN , tpl )
     for i in reversed(list(iters)):
         path = i.group(1)
         path = compileCommon(path , 'local' , True) #内部可能有替换的变量
-        if not path.startswith('http'):
-            tpl =  tpl[0:i.start(1)] +  i.group(1) + '?t=' + getFileTimeStamp( path ) + tpl[i.end(1):]
+        if not path.startswith('http') and not conf.getConfig()['disableAutoTimestamp']:
+            tpl =  tpl[0:i.start(1)] +  i.group(1) + '?t=' + getFileTimeStamp( path , filepath ) + tpl[i.end(1):]
 
 
 
@@ -171,8 +175,8 @@ def compileCss(filepath):
     for i in reversed(list(iters)):
         imgpath = i.group(1)
         imgpath = compileCommon(imgpath , 'local' , True) #内部可能有替换的变量
-        if not imgpath.startswith('http'):
-            css = css[0:i.end(0)-1] + '?t=' + getFileTimeStamp( imgpath ) + css[i.end(0)-1:]
+        if not imgpath.startswith('http') and not conf.getConfig()['disableAutoTimestamp']:
+            css = css[0:i.end(0)-1] + '?t=' + getFileTimeStamp( imgpath , filepath ) + css[i.end(0)-1:]
 
     return css
     
