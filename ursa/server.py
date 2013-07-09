@@ -45,7 +45,16 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         if response != 301:
             self.wfile.write(body)
 
-    def urlProxy(self , url , query):
+    def urlProxy(self , url , query , reg , truncate_path):
+        s = re.search('\$\{(.+)\}' , url) 
+        if s:
+            name = s.group(1)
+            reg = re.sub( '\{.+\}' , '(.+)' , reg )
+            m = re.match(reg, truncate_path )
+            if m:
+                 path = m.group(1)
+                 url = url.replace( '${'+name+'}' , path )
+
         url = url if url.find('?')!=-1 else (url + '?')
         response = urllib2.urlopen(url + query)
         contentType = response.info()['Content-Type']
@@ -80,10 +89,10 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         isInServerConfig = False
         if 'proxy' in serverConfig:
             for reg,target in serverConfig['proxy'].items():
-                if re.search(reg , truncate_path):
+                if re.search(re.sub( "\{.+\}$" , "" , reg )  , truncate_path):
                     isInServerConfig = True
                     if target.startswith('http'):#http url
-                        contentType,body =self.urlProxy(target , query)
+                        contentType,body =self.urlProxy(target , query, reg , truncate_path)
                     elif target.startswith('plugins'):#local plugins
                         contentType , body = self.pluginsProxy(target , query)
 

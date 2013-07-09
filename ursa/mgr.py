@@ -39,10 +39,13 @@ def getRawData(token):
     """
     fpath = BASE + token + SUFFIX
     if os.path.exists(fpath):
-        return utils.readfile( fpath )
+        data = utils.readfile( fpath )
     else:
-        return ''
-    
+        data = ''
+
+
+    data = re.sub( '\/\*.*?\*\/' , '' , data )
+    return data
 
 def getData(token):
     """

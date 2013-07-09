@@ -150,14 +150,14 @@ def compileHTML(filepath , needCompress):
     for i in reversed(list(iters)):
         path = i.group(1)
         path = compileCommon(path , 'local' , True) #内部可能有替换的变量
-        if not path.startswith('http') and not conf.getConfig()['disableAutoTimestamp']:
+        if not path.startswith('http') and not conf.getConfig().get('disableAutoTimestamp'):
             tpl =  tpl[0:i.start(1)] +  i.group(1) + '?t=' + getFileTimeStamp( path , filepath ) + tpl[i.end(1):]
 
     iters = re.finditer( SCRIPT_TOKEN , tpl )
     for i in reversed(list(iters)):
         path = i.group(1)
         path = compileCommon(path , 'local' , True) #内部可能有替换的变量
-        if not path.startswith('http') and not conf.getConfig()['disableAutoTimestamp']:
+        if not path.startswith('http') and not conf.getConfig().get('disableAutoTimestamp'):
             tpl =  tpl[0:i.start(1)] +  i.group(1) + '?t=' + getFileTimeStamp( path , filepath ) + tpl[i.end(1):]
 
 
@@ -175,7 +175,7 @@ def compileCss(filepath):
     for i in reversed(list(iters)):
         imgpath = i.group(1)
         imgpath = compileCommon(imgpath , 'local' , True) #内部可能有替换的变量
-        if not imgpath.startswith('http') and not conf.getConfig()['disableAutoTimestamp']:
+        if not imgpath.startswith('http') and not conf.getConfig().get('disableAutoTimestamp'):
             css = css[0:i.end(0)-1] + '?t=' + getFileTimeStamp( imgpath , filepath ) + css[i.end(0)-1:]
 
     return css
