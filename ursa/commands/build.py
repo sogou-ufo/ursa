@@ -129,6 +129,11 @@ def run(params , options):
         log.error('Please insure you have install r.js on your computer')
         raise
     
+    log.log('Begin to addTimestamps...' , True)
+    compileCss();
+
+    log.success('Success!')
+
 
     if options.get('html'):
         utils.createfolder( os.path.join( BUILD_DIR ,  'html'))
@@ -137,11 +142,6 @@ def run(params , options):
     compileHTML(options.get('compress') , options.get('html'))
     log.success('Success!')
     
-    log.log('Begin to addTimestamps...' , True)
-    compileCss();
-
-    log.success('Success!')
-
 
     log.log('Begin to replace all token...', True)
 
