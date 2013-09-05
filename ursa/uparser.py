@@ -94,11 +94,17 @@ def compileCommon(filepath , token , force=False):
             return False
         content = utils.readfile( filepath )
     TM_TOKEN = '@tm:(.*?)@'
+    DATE_TOKEN = '@date@';
     COMMON_TOKEN = '@(.*?)@'
+    
 
     iters = re.finditer( TM_TOKEN , content )
     for i in reversed(list(iters)):
         content = content[0:i.start(0)] + getFileTimeStamp(i.group(1) , filepath) + content[i.end(0):]
+
+    iters = re.finditer( DATE_TOKEN , content )
+    for i in reversed(list(iters)):
+        content = content[0:i.start(0)] + utils.getDate()  + content[i.end(0):]
 
     iters = re.finditer( COMMON_TOKEN , content )
 

@@ -35,7 +35,7 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
         if response == 301:
             self.send_header("Location", body)
-        if not contentType or (contentType.find('image') != 0 and contentType.find('flash')==-1 ):
+        if not contentType or (contentType.find('image') != 0 and contentType.find('flash')==-1 and contentType.find('audio')==-1 ):
             try:
                 body = body.encode(conf.getConfig()['encoding']);
             except UnicodeDecodeError:
@@ -151,7 +151,7 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             stat_result = os.stat(file_path)    
             mime_type, encoding = mimetypes.guess_type(file_path)
 
-            if not mime_type or (mime_type.find('image')==0 or mime_type.find('flash')!=-1):
+            if not mime_type or (mime_type.find('image')==0 or mime_type.find('flash')!=-1 or mime_type.find('audio')!=-1):
                 f = open(file_path , 'rb')
                 fcontent = f.read()
             else:

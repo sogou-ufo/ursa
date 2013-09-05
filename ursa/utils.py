@@ -2,6 +2,7 @@
 #-*- coding:utf-8 -*-
 
 import codecs
+import time
 import urllib
 import os
 import shutil
@@ -112,3 +113,6 @@ def md5toInt(md5):
         result = result+num
         
     return result
+
+def getDate():
+    return time.strftime("%Y%m%d%S", time.localtime())
