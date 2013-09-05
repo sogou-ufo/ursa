@@ -7,7 +7,7 @@ import json
 import hashlib
 import re
 
-from jinja2 import Template,Environment,FileSystemLoader,TemplateNotFound
+from jinja2 import Template,Environment,FileSystemLoader,TemplateNotFound,TemplateSyntaxError
 
 import conf
 import utils
@@ -48,6 +48,8 @@ def parseTpl(token , data={} , noGetTpl = False , isbuild = False):
         body = body.render(data)
     except TemplateNotFound as e:
         return 'Template %s not found' % (str(e) ,)
+    except TemplateSyntaxError as e:#yinyong@sogou-inc.com:捕获语法错误，很有用
+        return 'Template %s:%d Syntax Error:%s' % (e.filename,e.lineno,e.message)
     except Exception as e:
         print e
         return ''
@@ -176,13 +178,14 @@ def compileCss(filepath):
         return False
     css = utils.readfile( filepath )
     
-    IMG_TOKEN = 'url\([\'"]?(.*?)[\'"]?\)'
+    #@todo:正则有问题,识别url("data:image/png,base64...")之类带引号的有bug-yinyong@sogou-inc.com
+    IMG_TOKEN = 'url\([\'"]?(?!data:image|about:blank)(.*?)[\'"]?\)'#yinyong@sogou-inc.com:忽略base64图片和about:blank
     iters = re.finditer( IMG_TOKEN , css )
     for i in reversed(list(iters)):
         imgpath = i.group(1)
         imgpath = compileCommon(imgpath , 'local' , True) #内部可能有替换的变量
-        if not imgpath.startswith('http') and not conf.getConfig().get('disableAutoTimestamp'):
-            css = css[0:i.end(0)-1] + '?t=' + getFileTimeStamp( imgpath , filepath ) + css[i.end(0)-1:]
+        if not imgpath.startswith('http') and not conf.getConfig().get('disableAutoTimestamp'):#yinyong@sogou-inc.com:为什么http开头的不给加时间戳
+            css = css[0:i.end(0)-1] + '?t=' + getFileTimeStamp( imgpath , filepath ) + css[i.end(0)-1:]#yinyong@sogou-inc.com:已经带?的做过识别么？
 
     return css
     

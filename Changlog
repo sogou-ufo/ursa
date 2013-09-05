@@ -1,3 +1,8 @@
+20130905
+增加多css文件编译，不建议继续使用require_modules，替换为require_js_modules，增加require_css_modules
+避免对css文件中url内容为about:blank或data:image/的项目加时间戳
+增加html_force_output配置参数，用于在输出HTML时跳过出错模板
+
 20130529
 修改有目录的token为 a.b.c
 增加_folder变量，为根目录
