@@ -52,9 +52,9 @@ def compileHTML( needCompress = False , needHtml = False ):
         tplfiles = []
         for dirpath , dirnames, filenames in os.walk(base):
             tplfiles.extend( [ os.path.join(dirpath , f) for f in filenames if f.endswith('.tpl') ] )
-        for fname in tplfiles:#有强行编译的需求
+        for fname in tplfiles:
             token = fname.replace( base + '/' , '' ).replace('.tpl' , '')
-            try:
+            try:#有强行编译的需求
                 html = parser.parseTpl(token  , isbuild=True)
             
                 if token.find('/') != -1:
@@ -170,7 +170,7 @@ def run(params , options):
         log.success('Success!')
 
         log.log('Begin to compile Css...' , True)
-        for module in require_css_modules:#yinyong@sogou-inc.com:Compile css set
+        for module in require_css_modules:#yinyong@sogou-inc.com:编辑CSS集合
             css = os.path.join(PATH, BUILD_DIR , 'static' , 'css', conf.getConfig().get('css_folder') or ''  , module + '.css' )
             subprocess.call( 'java -jar ' + YCPATH + ' --type css --charset ' + conf.getConfig()['encoding'] + ' ' + css + ' -o ' + css , shell=True );
        # subprocess.call( 'java -jar ' + YCPATH + ' --type css --charset ' + conf.getConfig()['encoding'] + ' ' + maincss + ' -o ' + maincss , shell=True);
