@@ -14,22 +14,13 @@ path = os.getcwd()
 encoding = 'utf-8'
 base = os.path.abspath(os.path.dirname(__file__)) 
 
-
 template_dir = 'template'
 static_prefix = ''
-
-
-
-
-
-
-
 
 def getPath():
     """
     """
     return path
-
 
 def getConfig():
     """
