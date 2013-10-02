@@ -44,7 +44,7 @@ def getRawData(token):
         data = ''
 
 
-    data = re.sub( '\/\*.*?\*\/' , '' , data )
+    data = re.sub( '\/\*[\s\S]*?\*\/' , '' , data )
     return data
 
 def getData(token):
