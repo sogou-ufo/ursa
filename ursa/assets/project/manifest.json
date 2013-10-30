@@ -1,5 +1,6 @@
 {
-    "static_prefix":".",
-    "require_modules":["main"],
-    "local":{}
+    "static_prefix": ".",
+    "require_js_modules": ["main"],
+    "require_css_modules": ["main"],
+    "local": {}
 }
