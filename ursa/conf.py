@@ -6,7 +6,7 @@ import json
 
 import utils
 import log
-
+import re
 
 PKG_OPEN = ['share' , 'auth']
 
@@ -32,7 +32,7 @@ def getConfig():
             f = open(conffile)
             body = f.read()
             f.close()
-            conf.update( json.loads( body ) )
+            conf.update( json.loads( re.sub('\/\*[\s\S]*?\*\/','',body) ) )
         except ValueError:
             log.error('Your format of manifest.json is wrong.')
         except:
