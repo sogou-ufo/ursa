@@ -151,21 +151,21 @@ def compileHTML(filepath , needCompress):
 
     log.log( 'Compile for '+ filepath + '.' )
 
-    LINK_TOKEN = '<link.* href=[\'"](.*?\.css)[\'"]'
-    SCRIPT_TOKEN = '<script.* src=[\'"](.*?\.js)[\'"]'
+    LINK_TOKEN = '<link.* href=[\'"](?!http|https)(.*?\.css)[\'"]' # 不包含以http/https开头的资源
+    SCRIPT_TOKEN = '<script.* src=[\'"](?!http|https)(.*?\.js)[\'"]'
 
     iters = re.finditer( LINK_TOKEN , tpl )
     for i in reversed(list(iters)):
         path = i.group(1)
         path = compileCommon(path , 'local' , True) #内部可能有替换的变量
-        if not path.startswith('http') and not conf.getConfig().get('disableAutoTimestamp'):
+        if not conf.getConfig().get('disableAutoTimestamp'):
             tpl =  tpl[0:i.start(1)] +  i.group(1) + '?t=' + getFileTimeStamp( path , filepath ) + tpl[i.end(1):]
 
     iters = re.finditer( SCRIPT_TOKEN , tpl )
     for i in reversed(list(iters)):
         path = i.group(1)
         path = compileCommon(path , 'local' , True) #内部可能有替换的变量
-        if not path.startswith('http') and not conf.getConfig().get('disableAutoTimestamp'):
+        if not conf.getConfig().get('disableAutoTimestamp'):
             tpl =  tpl[0:i.start(1)] +  i.group(1) + '?t=' + getFileTimeStamp( path , filepath ) + tpl[i.end(1):]
 
 
@@ -179,12 +179,12 @@ def compileCss(filepath):
     css = utils.readfile( filepath )
     
     #@todo:正则有问题,识别url("data:image/png,base64...")之类带引号的有bug-yinyong@sogou-inc.com
-    IMG_TOKEN = 'url\([\'"]?(?!data:image|about:blank)(.*?)[\'"]?\)'#yinyong@sogou-inc.com:忽略base64图片和about:blank
+    IMG_TOKEN = 'url\([\'"]?(?!data:image|about:blank|http|https)(.*?)[\'"]?\)'#yinyong@sogou-inc.com:忽略base64图片和about:blank
     iters = re.finditer( IMG_TOKEN , css )
     for i in reversed(list(iters)):
         imgpath = i.group(1)
         imgpath = compileCommon(imgpath , 'local' , True) #内部可能有替换的变量
-        if not imgpath.startswith('http') and not conf.getConfig().get('disableAutoTimestamp'):#yinyong@sogou-inc.com:为什么http开头的不给加时间戳
+        if not conf.getConfig().get('disableAutoTimestamp'):#yinyong@sogou-inc.com:为什么http开头的不给加时间戳
             css = css[0:i.end(0)-1] + '?t=' + getFileTimeStamp( imgpath , filepath ) + css[i.end(0)-1:]#yinyong@sogou-inc.com:已经带?的做过识别么？
 
     return css
