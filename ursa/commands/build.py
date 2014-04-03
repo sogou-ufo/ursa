@@ -10,6 +10,7 @@ import utils
 import conf
 import log
 import uparser as parser
+import sys
 
 BUILD_DIR = 'build'
 PATH = conf.getConfig()['path'] 
@@ -122,7 +123,7 @@ def run(params , options):
         log.warn("'require_modules' is deprecated,you should use 'require_js_modules' instead!")
 
     require_modules = conf.getConfig().get('require_js_modules') or conf.getConfig().get('require_modules') or ['main']
-    require_js_modules=require_modules#yinyong@sogou-inc.com:历史遗留
+    require_js_modules = require_modules#yinyong@sogou-inc.com:历史遗留
     require_css_modules = conf.getConfig().get('require_css_modules') or ['main']
     
     #@deprecated
@@ -132,12 +133,22 @@ def run(params , options):
         log.log( 'Combine css&js with r.js' )
         for module in require_js_modules:
             js = os.path.join(PATH, BUILD_DIR , 'static' , 'js' , conf.getConfig().get('js_folder') or '' , module + '.js' )
-            subprocess.call( 'node ' + RJSPATH +' -o name=' + module + ' out='+ js + ' optimize=none baseUrl=' + os.path.join(PATH , BUILD_DIR , 'static' , 'js' , conf.getConfig().get('js_folder') or '')  , shell=True)#使用YUICompressor压缩，这里仅合并
+            p = subprocess.Popen( 'r.js -o name=' + module + ' out='+ js + ' optimize=none baseUrl=' + os.path.join(PATH , BUILD_DIR , 'static' , 'js' , conf.getConfig().get('js_folder') or '') , stdout = subprocess.PIPE , stderr = subprocess.PIPE , shell =True)#使用YUICompressor压缩，这里仅合并
+            (o,e) = p.communicate();
+            print o
+            print e
+            if not p.returncode==0:
+                raise IOError('Combine js failed')
         
         #yinyong@sogou-inc.com:合并css集合
         for module in require_css_modules:
             css=os.path.join( PATH , BUILD_DIR , 'static' , 'css' , conf.getConfig().get('css_folder') or '' , module + '.css' )
-            subprocess.call( 'node ' + RJSPATH + ' -o cssIn=' + css + ' out=' + css  , shell=True)#cssIn参数带.css后缀
+            p = subprocess.Popen( 'r.js -o cssIn=' + css + ' out=' + css  , stdout = subprocess.PIPE , stderr = subprocess.PIPE , shell=True)#cssIn参数带.css后缀
+            (o,e) = p.communicate();
+            print o
+            print e
+            if not p.returncode==0:
+                raise IOError('Combine css failed')
         log.success( 'Combine css&js with r.js success.' )
     except:
         log.error('Please insure you have installed r.js on your computer')
